@@ -1,0 +1,187 @@
+#Import Dataset
+library(readxl)
+data <- read_excel("data.xlsx")
+View(data)
+
+#Count the rows and columns of the whole dataset
+cat("Number of rows:", nrow(data), "\n")
+Number of rows: 3279 #Result
+cat("Number of columns:", ncal(data), "\n")
+Number of columns: 1560 #Result
+data_reduced <- data[, -c(5:1559)] #Remove the terms columns
+head(data_reduced,5) #Display first 5 columns of the data
+
+#subset the data with "ad." displayed in the last column
+ad <- data[data$`1558`== "ad.",] 
+#subset the data with "nonad." displayed in the last column
+nonad <- data[data$`1558`== "nonad.",] 
+#count the number of ad and nonad
+cat("Number of ad images: ", nrow(ad), "\n")
+cat("Number of non-ad images: ", nrow(nonad), "\n")
+#Replace all “?” with NA:
+data[data == "?"] <- NA 
+#Load missing value rows  to na_count dataset:
+na_counts <- data[!complete.cases(data), ] 
+#Display the clean data
+clean_data <- data[complete.cases(data), ]
+
+# Convert height and width to numeric
+clean_data$height <- as.numeric(clean_data$`0`)
+clean_data$width  <- as.numeric(clean_data$`1`)
+clean_data$aspect_ratio <- as.numeric(clean_data$`2`)
+# Recalculate aspect ratio as width / height
+clean_data$aspect_ratio <- round(clean_data$width / clean_data$height, 4)
+# View the result (with first 5 rows)
+head(clean_data[, c("height", "width", "aspect_ratio")], 5)
+clean_data <- clean_data[, -c(5:1559)]
+tail(clean_data, 5) #View 5 last rows
+
+# Convert status: "nonad." -> 0, "ad." -> 1
+clean_data$status <- ifelse(clean_data$status == "ad.", 1, 0)
+# View the status after conversion
+table(clean_data$status)
+# Select the relevant numeric columns
+numeric_cols <- clean_data[, c("height", "width", "aspect_ratio")]
+
+# Function to compute all summary statistics for a vector
+get_stats <- function(x) {
+  q <- quantile(x, probs = c(0.25, 0.75), na.rm = TRUE)
+  return(c(
+    Mean = mean(x, na.rm = TRUE),
+    Median = median(x, na.rm = TRUE),
+    Std_Dev = sd(x, na.rm = TRUE),
+    IQR = IQR(x, na.rm = TRUE),
+    Min = min(x, na.rm = TRUE),
+    Q1 = q[1],
+    Q3 = q[2],
+    Max = max(x, na.rm = TRUE)
+  ))
+}
+
+# Apply the function to each numeric column
+summary_stats <- t(sapply(numeric_cols, get_stats))
+
+# Convert to data frame and round for presentation
+summary_stats <- as.data.frame(round(summary_stats, 4))
+
+# Add a 'Feature' column
+summary_stats$Feature <- rownames(summary_stats)
+rownames(summary_stats) <- NULL
+
+# View the result
+print(summary_stats)
+
+# Histogram for Height with black border and closer labels
+h1 <- hist(clean_data$height,
+           main = "Histogram of Height",
+           xlab = "Height",
+           col = "lightblue",
+           border = "black")
+text(h1$mids, h1$counts, labels = h1$counts, pos = 3, offset = 0.25, cex = 1)
+
+# Histogram for Width with black border and closer labels
+h2 <- hist(clean_data$width,
+           main = "Histogram of Width",
+           xlab = "Width",
+           col = "lightgreen",
+           border = "black")
+text(h2$mids, h2$counts, labels = h2$counts, pos = 3, offset = 0.25, cex = 1)
+
+# Histogram for Aspect Ratio with black border and closer labels
+h3 <- hist(clean_data$aspect_ratio,
+           main = "Histogram of Aspect Ratio",
+           xlab = "Aspect Ratio",
+           col = "lightcoral",
+           border = "black")
+text(h3$mids, h3$counts, labels = h3$counts, pos = 3, offset = 0.25, cex = 1)
+# Set layout: 1 rows, 3 columns
+par(mfrow = c(1, 3))
+
+# === Non-ad ===
+h1 <- hist(clean_data$height[clean_data$status == 0],
+           main = "Height (Non-ad)", xlab = "Height",
+           col = "lightgray", border = "black")
+text(h1$mids, h1$counts, labels = h1$counts, pos = 3, cex = 0.8)
+
+h2 <- hist(clean_data$width[clean_data$status == 0],
+           main = "Width (Non-ad)", xlab = "Width",
+           col = "lightgray", border = "black")
+text(h2$mids, h2$counts, labels = h2$counts, pos = 3, cex = 0.8)
+
+h3 <- hist(clean_data$aspect_ratio[clean_data$status == 0],
+           main = "Aspect Ratio (Non-ad)", xlab = "Aspect Ratio",
+           col = "lightgray", border = "black"))
+text(h3$mids, h3$counts, labels = h3$counts, pos = 3, cex = 0.8)
+
+# Set layout: 1 rows, 3 columns
+par(mfrow = c(1, 3))
+# === Ad ===
+h4 <- hist(clean_data$height[clean_data$status == 1],
+           main = "Height (Ad)", xlab = "Height",
+           col = "lightblue", border = "black")
+text(h4$mids, h4$counts, labels = h4$counts, pos = 3, cex = 0.8)
+
+h5 <- hist(clean_data$width[clean_data$status == 1],
+           main = "Width (Ad)", xlab = "Width",
+           col = "lightblue", border = "black")
+text(h5$mids, h5$counts, labels = h5$counts, pos = 3, cex = 0.8)
+
+h6 <- hist(clean_data$aspect_ratio[clean_data$status == 1],
+           main = "Aspect Ratio (Ad)", xlab = "Aspect Ratio",
+           col = "lightblue", border = "black")
+text(h6$mids, h6$counts, labels = h6$counts, pos = 3, cex = 0.8)
+
+
+# 1 line, 3 plots
+par(mfrow = c(1, 3))
+
+# Boxplot height by status
+boxplot(height ~ status,
+        data = clean_data,
+        main = "Height by Status",
+        xlab = "Status",
+        ylab = "Height",
+        col = c("lightgray", "lightblue"),
+        border = "black",
+        names = c("Non-ad", "Ad"))
+
+# Boxplot width by status
+boxplot(width ~ status,
+        data = clean_data,
+        main = "Width by Status",
+        xlab = "Status",
+        ylab = "Width",
+        col = c("lightgray", "lightgreen"),
+        border = "black",
+        names = c("Non-ad", "Ad"))
+
+# Boxplot Aspect Ratio by status
+boxplot(aspect_ratio ~ status,
+        data = clean_data,
+        main = "Aspect Ratio by Status",
+        xlab = "Status",
+        ylab = "Aspect Ratio",
+        col = c("lightgray", "lightcoral"),
+        border = "black",
+        names = c("Non-ad", "Ad"))
+
+# Reset layout
+par(mfrow = c(1, 1))
+
+# T-test: compare means of height between ad and nonad
+t.test(height ~ status, data = clean_data)
+
+# T-test for width
+t.test(width ~ status, data = clean_data)
+
+# T-test for aspect ratio
+t.test(aspect_ratio ~ status, data = clean_data)
+
+# Correlation between height and width
+cor.test(clean_data$height, clean_data$width)
+
+# Correlation between height and aspect_ratio
+cor.test(clean_data$height, clean_data$aspect_ratio)
+
+# Correlation between width and aspect_ratio
+cor.test(clean_data$width, clean_data$aspect_ratio)
