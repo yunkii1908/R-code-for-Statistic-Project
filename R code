@@ -5,9 +5,9 @@ View(data)
 
 #Count the rows and columns of the whole dataset
 cat("Number of rows:", nrow(data), "\n")
-Number of rows: 3279 #Result
+#Result: Number of rows: 3279 
 cat("Number of columns:", ncal(data), "\n")
-Number of columns: 1560 #Result
+#Result: Number of columns: 1560 
 data_reduced <- data[, -c(5:1559)] #Remove the terms columns
 head(data_reduced,5) #Display first 5 columns of the data
 
