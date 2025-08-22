@@ -10,7 +10,7 @@ cat("Number of rows:", nrow(data), "\n")
 cat("Number of columns:", ncal(data), "\n")
 # Result: Number of columns: 1560 
 
-data_reduced <- data[, -c(5:1559)] #Remove the terms columns
+data_reduced <- data[, -c(5:1559)] # Remove the terms columns
 head(data_reduced, 5) # Display first 5 columns of the data
 
 # Subset the data with "ad." displayed in the last column
@@ -43,7 +43,7 @@ clean_data$aspect_ratio <- round(clean_data$width / clean_data$height, 4)
 # View the result (with first 5 rows)
 head(clean_data[, c("height", "width", "aspect_ratio")], 5)
 clean_data <- clean_data[, -c(5:1559)]
-tail(clean_data, 5) #View 5 last rows
+tail(clean_data, 5) # View 5 last rows
 
 # Convert status: "nonad." -> 0, "ad." -> 1
 clean_data$status <- ifelse(clean_data$status == "ad.", 1, 0)
