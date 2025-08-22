@@ -6,7 +6,6 @@ View(data)
 # Count the rows and columns of the whole dataset
 cat("Number of rows:", nrow(data), "\n")
 # Result: Number of rows: 3279 
-
 cat("Number of columns:", ncal(data), "\n")
 # Result: Number of columns: 1560 
 
@@ -127,6 +126,7 @@ text(h3$mids, h3$counts, labels = h3$counts, pos = 3, cex = 0.8)
 
 # Set layout: 1 rows, 3 columns
 par(mfrow = c(1, 3))
+
 # === Ad ===
 h4 <- hist(clean_data$height[clean_data$status == 1],
            main = "Height (Ad)", xlab = "Height",
@@ -142,7 +142,6 @@ h6 <- hist(clean_data$aspect_ratio[clean_data$status == 1],
            main = "Aspect Ratio (Ad)", xlab = "Aspect Ratio",
            col = "lightblue", border = "black")
 text(h6$mids, h6$counts, labels = h6$counts, pos = 3, cex = 0.8)
-
 
 # 1 line, 3 plots
 par(mfrow = c(1, 3))
