@@ -1,35 +1,35 @@
-#Import Dataset
+# Import Dataset
 library(readxl)
 data <- read_excel("data.xlsx")
 View(data)
 
-#Count the rows and columns of the whole dataset
+# Count the rows and columns of the whole dataset
 cat("Number of rows:", nrow(data), "\n")
-#Result: Number of rows: 3279 
+# Result: Number of rows: 3279 
 
 cat("Number of columns:", ncal(data), "\n")
-#Result: Number of columns: 1560 
+# Result: Number of columns: 1560 
 
 data_reduced <- data[, -c(5:1559)] #Remove the terms columns
 head(data_reduced,5) #Display first 5 columns of the data
 
-#Subset the data with "ad." displayed in the last column
+# Subset the data with "ad." displayed in the last column
 ad <- data[data$`1558`== "ad.",] 
 
-#Subset the data with "nonad." displayed in the last column
+# Subset the data with "nonad." displayed in the last column
 nonad <- data[data$`1558`== "nonad.",] 
 
-#Count the number of ad and nonad
+# Count the number of ad and nonad
 cat("Number of ad images: ", nrow(ad), "\n")
 cat("Number of non-ad images: ", nrow(nonad), "\n")
 
-#Replace all “?” with NA:
+# Replace all “?” with NA:
 data[data == "?"] <- NA 
 
-#Load missing value rows  to na_count dataset:
+# Load missing value rows  to na_count dataset:
 na_counts <- data[!complete.cases(data), ] 
 
-#Display the clean data
+# Display the clean data
 clean_data <- data[complete.cases(data), ]
 
 # Convert height and width to numeric
