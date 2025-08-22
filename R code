@@ -11,7 +11,7 @@ cat("Number of columns:", ncal(data), "\n")
 # Result: Number of columns: 1560 
 
 data_reduced <- data[, -c(5:1559)] #Remove the terms columns
-head(data_reduced,5) # Display first 5 columns of the data
+head(data_reduced, 5) # Display first 5 columns of the data
 
 # Subset the data with "ad." displayed in the last column
 ad <- data[data$`1558`== "ad.",] 
